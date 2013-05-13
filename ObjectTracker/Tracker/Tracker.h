@@ -1,28 +1,6 @@
-ObjectTracker
-=============
-
-When you create your own subclasses, it's easy to add a log message to the "dealloc" method, to verify that in fact the object has been dealloced when expected. But what about other system classes, particularly those that are not designed to be subclassed. Other than poking around Instruments's ObjectAllocation, it's virtually impossible to see when such objects are deallocated.
-
-But no more! With ObjectTracker, you can tag any object you want, and when its dealloced you will see:
-
-- a msg that you tagged the object with
-- how long the object lived
-- the decription of the object at the time you tracked it
-- whether the object was created on the main thread but dealloced on a different thread, or vice versa
-
-Usage:
-
-- import Tracker.h in your pch file
-- use this line to track an object: "[Tracker trackerWithObject:obj msg:@"Some Msg"];
-
-Notes:
-
-1) Duplicate track requests on the same object cause the older request to be replaced with the newer one.
-
-License:
-
 //
 // ObjectTracker (TM)
+// Tracker.h
 // Copyright (C) 2013 by David Hoerl
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -43,3 +21,23 @@ License:
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+
+// Add "import "Tracker.h" to you pch file for easy usage
+
+@interface Tracker : NSObject
+@property (atomic, copy) NSString *msg;					// from factory creation
+@property (atomic, assign) BOOL isMainThread;			// created on the main thread
+@property (atomic, copy) NSString *objDescription;		// snapshot of object description when created
+@property (atomic, strong) NSDate *objCreateDate;		// creation
+@property (atomic, strong) Class objClass;				// Object class
+
+// Designated factory Track creation
++ (instancetype)trackerWithObject:(id)someObject msg:(NSString *)someMsg;
+
++ (NSSet *)allTrackers;									// all
++ (NSSet *)allTrackersOfClass:(Class)classObject;		// all say NSArray (and subclasses of that)
+
++ (void)printSet:(NSSet *)set;							// convenience routine
+
+@end
